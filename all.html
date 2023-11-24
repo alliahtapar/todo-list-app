@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>TODO LIST</title>
+</head>
+<body>
+
+    <h1>TODO LIST APP</h1>
+
+    <input type="text" id="taskInput" placeholder="Add a task">
+    <h2>
+        <button onclick="createTask()">Create</button>
+        <button onclick="updateTask()">Update</button>
+        <button onclick="deleteTask()">Delete</button>
+    </h2>
+    
+    <ul id="taskList" onclick="selectTask(event)"></ul>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadTasks();
+        });
+
+        function createTask() {
+            var taskInput = document.getElementById("taskInput");
+            var taskList = document.getElementById("taskList");
+
+            if (taskInput.value.trim() === "") {
+                alert("Please enter a task");
+                return;
+            }
+
+            var li = document.createElement("li");
+            li.textContent = taskInput.value;
+
+            taskList.appendChild(li);
+            saveTasks();
+            taskInput.value = "";
+        }
+
+        function updateTask() {
+            var taskInput = document.getElementById("taskInput");
+            var taskList = document.getElementById("taskList");
+
+            var selectedTask = taskList.querySelector(".selected");
+
+            if (selectedTask) {
+                selectedTask.textContent = taskInput.value;
+                selectedTask.classList.remove("selected");
+                saveTasks();
+                taskInput.value = "";
+            } else {
+                alert("Please select a task to update");
+            }
+        }
+
+        function deleteTask() {
+            var taskList = document.getElementById("taskList");
+
+            var selectedTask = taskList.querySelector(".selected");
+            if (selectedTask) {
+                taskList.removeChild(selectedTask);
+                saveTasks();
+            } else {
+                alert("Please select a task to delete");
+            }
+        }
+
+        function selectTask(event) {
+            var taskList = document.getElementById("taskList");
+            var target = event.target;
+
+            if (target.tagName === "LI" && target.parentNode === taskList) {
+                var selectedTask = taskList.querySelector(".selected");
+
+                if (selectedTask) {
+                    selectedTask.classList.remove("selected");
+                }
+
+                target.classList.add("selected");
+
+                var taskInput = document.getElementById("taskInput");
+                taskInput.value = target.textContent;
+            }
+        }
+
+        function saveTasks() {
+            var taskList = document.getElementById("taskList");
+            var tasks = [];
+
+            for (var i = 0; i < taskList.children.length; i++) {
+                tasks.push(taskList.children[i].textContent);
+            }
+
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            var taskList = document.getElementById("taskList");
+            var tasks = localStorage.getItem("tasks");
+
+            if (tasks) {
+                tasks = JSON.parse(tasks);
+
+                for (var i = 0; i < tasks.length; i++) {
+                    var li = document.createElement("li");
+                    li.textContent = tasks[i];
+
+                    taskList.appendChild(li);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
